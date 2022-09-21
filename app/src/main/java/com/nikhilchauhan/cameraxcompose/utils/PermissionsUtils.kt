@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 
 object PermissionsUtils {
-  private val PERMISSIONS = arrayOf(
+  val PERMISSIONS = arrayOf(
     Manifest.permission.CAMERA,
     Manifest.permission.READ_EXTERNAL_STORAGE,
   )

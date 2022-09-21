@@ -1,3 +1,8 @@
 <resources>
   <string name="app_name">CameraXCompose</string>
+  <string name="menu_icon">Menu Icon</string>
+  <string name="photos">photos</string>
+  <string name="title_photos">Photos</string>
+  <string name="capture_photo">capture_photo</string>
+  <string name="title_capture_photo">Capture</string>
 </resources>
