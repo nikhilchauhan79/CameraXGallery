@@ -13,5 +13,6 @@ data class Photo(
   @ColumnInfo(name = "album_name") val albumName: String?,
   @ColumnInfo(name = "album_id") val albumId: Long?,
   @ColumnInfo(name = "path") val path: String?,
-  @ColumnInfo(name = "total_photos") val totalPhotos: Int?
+  @ColumnInfo(name = "total_photos") val totalPhotos: Int?,
+  @ColumnInfo(name = "is_session_first") val isSessionFirst: Boolean = false
 )

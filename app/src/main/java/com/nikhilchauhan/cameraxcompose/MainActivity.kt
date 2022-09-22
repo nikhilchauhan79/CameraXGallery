@@ -11,6 +11,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,11 +51,12 @@ class MainActivity : ComponentActivity() {
       LaunchedEffect(key1 = Unit) {
         galleryVM.getPhotosFromDB()
       }
+
       CameraXComposeTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
           GalleryScreen(
-            galleryVM.photosList.value, galleryVM.photoCaptureState.value,
+            galleryVM.photoDbState.value, galleryVM.photoCaptureState.value,
             galleryVM.showProgress.value
           ) { captureState ->
             handleCaptureState(captureState, galleryVM) {

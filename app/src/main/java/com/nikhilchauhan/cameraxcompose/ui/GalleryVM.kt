@@ -3,6 +3,7 @@ package com.nikhilchauhan.cameraxcompose.ui
 import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,15 +14,16 @@ import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.Success
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GalleryVM @Inject constructor(private val repository: PhotosRepository) : ViewModel() {
-  private val _photosList = mutableStateOf<DbState>(DbState.Init)
-  val photosList: State<DbState> = _photosList
-  private val photosMap = MutableStateFlow<MutableMap<Long?, List<Photo>>>(mutableMapOf())
+  private val _photosDbState = mutableStateOf<DbState>(DbState.Init)
+  private val photosStateList = mutableStateListOf<Photo>()
+  val photoDbState: State<DbState> = _photosDbState
+  private val _isSessionFirstPhoto = mutableStateOf(false)
+  private val isSessionFirstPhoto: State<Boolean> = _isSessionFirstPhoto
 
   val photoCaptureState: MutableState<CaptureState> = mutableStateOf(CaptureState.Init)
   private val totalCurrentSession = mutableStateOf(0)
@@ -36,6 +38,7 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
   }
 
   private fun onSessionStart() {
+    _isSessionFirstPhoto.value = true
     val time = System.currentTimeMillis()
     totalCurrentSession.value = 0
     sessionEnd.value = false
@@ -59,9 +62,10 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
     repository.savePhoto(
       Photo(
         0, currentPhoto.value, time, albumCurrentSession.value, albumId.value, uri.path,
-        totalCurrentSession.value
+        totalCurrentSession.value, isSessionFirstPhoto.value
       )
     )
+    _isSessionFirstPhoto.value = false
   }
 
   fun endSession() {
@@ -70,8 +74,10 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
 
   fun getPhotosFromDB() {
     viewModelScope.launch(Dispatchers.IO) {
-      _photosList.value = DbState.InProgress
-      _photosList.value = DbState.Success(repository.getPhotos())
+      _photosDbState.value = DbState.InProgress
+      val photos = repository.getPhotos()
+      _photosDbState.value = DbState.Success(photos)
+      photosStateList.addAll(photos)
     }
   }
 
