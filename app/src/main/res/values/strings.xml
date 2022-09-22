@@ -6,4 +6,5 @@
   <string name="capture_photo">capture_photo</string>
   <string name="title_capture_photo">Capture</string>
   <string name="title_activity_photo_capture">PhotoCaptureActivity</string>
+  <string name="albums">Albums</string>
 </resources>

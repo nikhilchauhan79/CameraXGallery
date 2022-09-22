@@ -54,6 +54,12 @@ class MainActivity : ComponentActivity() {
             galleryVM.photoDbState.collectAsState().value, galleryVM.photoCaptureState.value,
             galleryVM.showProgress.value, {
             galleryVM.endSession()
+          }, galleryVM.currentAlbum.collectAsState().value, { photo ->
+            galleryVM.getCurrentAlbum(photo)
+          }, { createMap ->
+            if (createMap) {
+              galleryVM.createPhotosMap()
+            }
           }
           ) { captureState ->
             handleCaptureState(captureState, galleryVM) {

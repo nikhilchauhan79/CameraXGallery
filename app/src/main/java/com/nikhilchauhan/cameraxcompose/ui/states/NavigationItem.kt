@@ -18,4 +18,9 @@ sealed class NavigationItem(
     AppConstants.NavItemRoutes.CAPTURE_PHOTO, R.drawable.ic_outline_add_a_photo_24,
     R.string.title_capture_photo
   )
+
+  object Album : NavigationItem(
+    AppConstants.NavItemRoutes.ALBUM, R.drawable.ic_outline_add_a_photo_24,
+    R.string.albums
+  )
 }

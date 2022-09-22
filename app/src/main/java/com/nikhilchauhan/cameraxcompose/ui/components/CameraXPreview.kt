@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -65,7 +66,10 @@ fun CameraXView(
 
   val preview = Preview.Builder().build()
   val previewView = remember { PreviewView(context) }
-  val imageCapture: ImageCapture = remember { ImageCapture.Builder().build() }
+  val imageCapture: ImageCapture = remember {
+    ImageCapture.Builder().setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY)
+      .build()
+  }
   val cameraSelector = CameraSelector.Builder()
     .requireLensFacing(lensFacing)
     .build()

@@ -15,16 +15,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GalleryVM @Inject constructor(private val repository: PhotosRepository) : ViewModel() {
   private val _photosDbState = MutableStateFlow<DbState>(DbState.Init)
+
   val photoDbState: StateFlow<DbState> = _photosDbState
   private val _isSessionFirstPhoto = mutableStateOf(false)
   private val isSessionFirstPhoto: State<Boolean> = _isSessionFirstPhoto
-
+  private val photosMap = MutableStateFlow<MutableMap<Long, MutableList<Photo>>>(mutableMapOf())
+  private val photosStateList: MutableStateFlow<MutableList<Photo>> = MutableStateFlow(
+    mutableListOf()
+  )
+  val currentAlbum = MutableStateFlow<MutableList<Photo>>(mutableListOf())
   val photoCaptureState: MutableState<CaptureState> = mutableStateOf(CaptureState.Init)
   private val totalCurrentSession = mutableStateOf(0)
   private val albumCurrentSession = mutableStateOf("")
@@ -47,6 +53,35 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
     albumId.value = time
   }
 
+  fun createPhotosMap() {
+    viewModelScope.launch(Dispatchers.IO) {
+      photosMap.value.clear()
+      photosStateList.value.forEach { photo ->
+        addOrPutToMap(photo)
+      }
+    }
+  }
+
+  private fun addOrPutToMap(photo: Photo) {
+    if (photosMap.value[photo.albumId] != null) {
+      if (photosMap.value.containsKey(photo.albumId)) {
+        photosMap.value[photo.albumId]?.add(photo)
+      }
+    } else {
+      photo.albumId?.let { nnId ->
+        photosMap.value[nnId] = mutableListOf()
+        photosMap.value[photo.albumId]?.add(photo)
+      }
+    }
+  }
+
+  fun getCurrentAlbum(photo: Photo) {
+    viewModelScope.launch(Dispatchers.IO) {
+      currentAlbum.value = mutableListOf()
+      photosMap.value[photo.albumId]?.toList()?.let { nnList -> currentAlbum.value.addAll(nnList) }
+    }
+  }
+
   fun savePhotoToDb(uri: Uri) {
     if (sessionEnd.value) {
       onSessionStart()
@@ -61,15 +96,17 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
       totalCurrentSession.value++
       photoCaptureState.value = Success(uri)
       currentPhoto.value = "Photo_$time"
+      val photo = Photo(
+        0, currentPhoto.value, time, albumCurrentSession.value, albumId.value, uri.path,
+        totalCurrentSession.value, isSessionFirstPhoto.value
+      )
       repository.savePhoto(
-        Photo(
-          0, currentPhoto.value, time, albumCurrentSession.value, albumId.value, uri.path,
-          totalCurrentSession.value, isSessionFirstPhoto.value
-        )
+        photo
       )
       _isSessionFirstPhoto.value = false
+      getPhotosFromDB()
+      addOrPutToMap(photo)
     }
-    getPhotosFromDB()
   }
 
   fun endSession() {
@@ -79,7 +116,9 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
   private fun getPhotosFromDB() {
     viewModelScope.launch(Dispatchers.IO) {
       _photosDbState.emit(DbState.InProgress)
+      photosStateList.value.clear()
       val photos = repository.getPhotos()
+      photosStateList.value.addAll(photos)
       _photosDbState.emit(DbState.Success(photos))
     }
   }

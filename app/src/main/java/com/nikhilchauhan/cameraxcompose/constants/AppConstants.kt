@@ -8,8 +8,9 @@ object AppConstants {
   const val MAIN_ACTIVITY: String = "MainActivity"
   const val DB_NAME: String = "camerax_db"
 
-  object NavItemRoutes{
+  object NavItemRoutes {
+    const val ALBUM: String = "album"
     const val GALLERY: String = "gallery"
-    const val CAPTURE_PHOTO : String= "capture_photo"
+    const val CAPTURE_PHOTO: String = "capture_photo"
   }
 }
