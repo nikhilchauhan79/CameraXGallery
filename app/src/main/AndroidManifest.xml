@@ -2,20 +2,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-  <uses-feature android:name="android.hardware.camera.any"/>
-  <uses-permission android:name="android.permission.CAMERA"/>
-
   <application
+      android:name=".CameraXCompose"
       android:allowBackup="true"
       android:dataExtractionRules="@xml/data_extraction_rules"
       android:fullBackupContent="@xml/backup_rules"
-      android:name=".CameraXCompose"
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:supportsRtl="true"
       android:theme="@style/Theme.CameraXCompose"
       tools:targetApi="31">
+    <activity
+        android:name=".PhotoCaptureActivity"
+        android:exported="false"
+        android:label="@string/title_activity_photo_capture"
+        android:theme="@style/Theme.CameraXCompose">
+      <meta-data
+          android:name="android.app.lib_name"
+          android:value="" />
+    </activity>
     <activity
         android:name=".MainActivity"
         android:exported="true"
@@ -32,5 +38,9 @@
           android:value="" />
     </activity>
   </application>
+
+  <uses-feature android:name="android.hardware.camera.any" />
+
+  <uses-permission android:name="android.permission.CAMERA" />
 
 </manifest>

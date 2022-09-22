@@ -4,6 +4,7 @@ import android.net.Uri
 import com.nikhilchauhan.cameraxcompose.localdatasource.entities.Photo
 
 sealed class CaptureState {
+  object Init : CaptureState()
   object InProgress : CaptureState()
   data class Success(val uri: Uri) : CaptureState()
   data class Error(

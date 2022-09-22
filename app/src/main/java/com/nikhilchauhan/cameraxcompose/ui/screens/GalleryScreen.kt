@@ -1,8 +1,5 @@
 package com.nikhilchauhan.cameraxcompose.ui.screens
 
-import android.net.Uri
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +13,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -31,24 +27,27 @@ import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 import com.nikhilchauhan.cameraxcompose.localdatasource.entities.Photo
 import com.nikhilchauhan.cameraxcompose.ui.components.BottomNavBar
 import com.nikhilchauhan.cameraxcompose.ui.components.CameraXAppBar
+import com.nikhilchauhan.cameraxcompose.ui.components.CameraXProgressBar
 import com.nikhilchauhan.cameraxcompose.ui.components.CameraXView
+import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState.Error
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState.InProgress
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState.Init
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState.Success
 import com.nikhilchauhan.cameraxcompose.utils.AppUtils.getOutputDirectory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
 
 @Composable
-fun GalleryScreen(dbState: DbState) {
+fun GalleryScreen(
+  dbState: DbState,
+  captureState: CaptureState,
+  showProgress: Boolean,
+  onImageCaptureStateChanged: (CaptureState) -> Unit,
+) {
   val scaffoldState: ScaffoldState = rememberScaffoldState()
   val navController = rememberNavController()
-  val context = LocalContext.current
-  val coroutineScope = rememberCoroutineScope()
 
   Scaffold(
     scaffoldState = scaffoldState,
@@ -58,11 +57,9 @@ fun GalleryScreen(dbState: DbState) {
     CameraXAppBar()
   }
   ) { paddingValues ->
-    NavHostGraph(navController, dbState, paddingValues) { uri ->
-      coroutineScope.launch(Dispatchers.Main) {
-        Toast.makeText(context, "Image capture success" + uri.path, Toast.LENGTH_LONG).show()
-      }
-    }
+    NavHostGraph(
+      navController, dbState, paddingValues, captureState, onImageCaptureStateChanged, showProgress
+    )
   }
 }
 
@@ -71,32 +68,39 @@ fun NavHostGraph(
   navController: NavHostController,
   dbState: DbState,
   paddingValues: PaddingValues,
-  onImageCapture: (Uri) -> Unit
+  captureState: CaptureState,
+  onImageCaptureStateChanged: (CaptureState) -> Unit,
+  showProgress: Boolean
 ) {
   val context = LocalContext.current
   val outputDirectory = getOutputDirectory(context)
   val cameraExecutor = Executors.newSingleThreadExecutor()
   NavHost(navController, startDestination = AppConstants.NavItemRoutes.GALLERY) {
     composable(AppConstants.NavItemRoutes.GALLERY) {
-      HandleDbState(dbState)
+      HandleDbState(dbState, showProgress)
     }
     composable(AppConstants.NavItemRoutes.CAPTURE_PHOTO) {
       CameraXView(
         outputDirectory = outputDirectory,
         executor = cameraExecutor,
-        onError = { Log.e(AppConstants.CAMERA_X_VIEW, "error capturing image:", it) },
-        onImageCaptured = onImageCapture, paddingValues = paddingValues
+        captureState = captureState,
+        onCaptureStateChanged = onImageCaptureStateChanged, paddingValues = paddingValues,
+        showProgress = showProgress
       )
     }
   }
 }
 
 @Composable
-private fun HandleDbState(dbState: DbState) {
+private fun HandleDbState(
+  dbState: DbState,
+  showProgress: Boolean
+) {
   when (dbState) {
     is Error -> {
     }
     InProgress -> {
+      CameraXProgressBar()
     }
     Init -> {
     }

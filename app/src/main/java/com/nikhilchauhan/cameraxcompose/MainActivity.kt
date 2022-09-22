@@ -17,6 +17,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 import com.nikhilchauhan.cameraxcompose.ui.GalleryVM
 import com.nikhilchauhan.cameraxcompose.ui.screens.GalleryScreen
+import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
+import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.Error
+import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.InProgress
 import com.nikhilchauhan.cameraxcompose.ui.theme.CameraXComposeTheme
 import com.nikhilchauhan.cameraxcompose.utils.PermissionsUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,8 +53,42 @@ class MainActivity : ComponentActivity() {
       CameraXComposeTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-          GalleryScreen(galleryVM.photosList.value)
+          GalleryScreen(
+            galleryVM.photosList.value, galleryVM.photoCaptureState.value,
+            galleryVM.showProgress.value
+          ) { captureState ->
+            handleCaptureState(captureState, galleryVM) {
+              galleryVM.showProgress.value = it
+            }
+          }
         }
+      }
+    }
+  }
+
+  private fun handleCaptureState(
+    captureState: CaptureState,
+    galleryVM: GalleryVM,
+    showProgress: (Boolean) -> Unit
+  ) {
+    when (captureState) {
+      is Error -> {
+        showProgress(false)
+        Log.d(
+          AppConstants.MAIN_ACTIVITY,
+          "handleCaptureState: " + captureState.message + "Error" + captureState.error
+        )
+      }
+      InProgress -> {
+        showProgress(true)
+        Log.d(AppConstants.MAIN_ACTIVITY, "handleCaptureState: " + "photo capture in progress")
+      }
+      CaptureState.Init -> {
+        showProgress(false)
+      }
+      is CaptureState.Success -> {
+        showProgress(false)
+        galleryVM.savePhotoToDb(captureState.uri)
       }
     }
   }

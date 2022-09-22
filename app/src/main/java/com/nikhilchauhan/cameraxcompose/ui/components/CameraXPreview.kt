@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -28,12 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.nikhilchauhan.cameraxcompose.R
 import com.nikhilchauhan.cameraxcompose.constants.AppConstants
+import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
+import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.InProgress
+import com.nikhilchauhan.cameraxcompose.utils.AlertUtils
 import java.io.File
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
@@ -43,11 +45,11 @@ import kotlin.coroutines.suspendCoroutine
 fun CameraXView(
   outputDirectory: File,
   executor: Executor,
-  onImageCaptured: (Uri) -> Unit,
-  onError: (ImageCaptureException) -> Unit,
-  paddingValues: PaddingValues
+  paddingValues: PaddingValues,
+  captureState: CaptureState,
+  onCaptureStateChanged: (CaptureState) -> Unit,
+  showProgress: Boolean
 ) {
-  // 1
   val lensFacing = CameraSelector.LENS_FACING_BACK
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -59,7 +61,6 @@ fun CameraXView(
     .requireLensFacing(lensFacing)
     .build()
 
-  // 2
   LaunchedEffect(lensFacing) {
     val cameraProvider = context.getCameraProvider()
     cameraProvider.unbindAll()
@@ -85,17 +86,21 @@ fun CameraXView(
       modifier = Modifier.padding(bottom = 20.dp),
       onClick = {
         Log.i(AppConstants.CAMERA_X_VIEW, "button clicked")
-        takePhoto(
-          imageCapture = imageCapture,
-          outputDirectory = outputDirectory,
-          executor = executor,
-          onImageCaptured = onImageCaptured,
-          onError = onError
-        )
+        if (captureState !is InProgress) {
+          onCaptureStateChanged(CaptureState.InProgress)
+          takePhoto(
+            imageCapture = imageCapture,
+            outputDirectory = outputDirectory,
+            executor = executor,
+            onImageCaptured = onCaptureStateChanged
+          )
+        } else {
+          AlertUtils.showToast(context, AppConstants.IMAGE_CAPTURE_IN_PROGRESS)
+        }
       },
       content = {
         Icon(
-          imageVector = Icons.Sharp.PlayArrow,
+          painter = painterResource(id = R.drawable.ic_outline_camera_24),
           contentDescription = stringResource(id = R.string.capture_photo),
           tint = White,
           modifier = Modifier
@@ -111,8 +116,7 @@ private fun takePhoto(
   imageCapture: ImageCapture,
   outputDirectory: File,
   executor: Executor,
-  onImageCaptured: (Uri) -> Unit,
-  onError: (ImageCaptureException) -> Unit
+  onImageCaptured: (CaptureState) -> Unit,
 ) {
 
   val photoFile = File(
@@ -125,12 +129,12 @@ private fun takePhoto(
   imageCapture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
     override fun onError(exception: ImageCaptureException) {
       Log.e(AppConstants.CAMERA_X_VIEW, "error capturing photo: ", exception)
-      onError(exception)
+      onImageCaptured(CaptureState.Error(exception, exception.message.toString()))
     }
 
     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
       val savedUri = Uri.fromFile(photoFile)
-      onImageCaptured(savedUri)
+      onImageCaptured(CaptureState.Success(savedUri))
     }
   })
 }
