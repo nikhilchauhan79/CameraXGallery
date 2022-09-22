@@ -52,6 +52,7 @@ fun GalleryScreen(
   dbState: DbState,
   captureState: CaptureState,
   showProgress: Boolean,
+  onSessionStart: () -> Unit,
   onImageCaptureStateChanged: (CaptureState) -> Unit,
 ) {
   val scaffoldState: ScaffoldState = rememberScaffoldState()
@@ -66,7 +67,8 @@ fun GalleryScreen(
   }
   ) { paddingValues ->
     NavHostGraph(
-      navController, dbState, paddingValues, captureState, onImageCaptureStateChanged, showProgress
+      navController, dbState, paddingValues, captureState, onImageCaptureStateChanged, showProgress,
+      onSessionStart
     )
   }
 }
@@ -78,14 +80,15 @@ fun NavHostGraph(
   paddingValues: PaddingValues,
   captureState: CaptureState,
   onImageCaptureStateChanged: (CaptureState) -> Unit,
-  showProgress: Boolean
+  showProgress: Boolean,
+  onSessionStart: () -> Unit
 ) {
   val context = LocalContext.current
   val outputDirectory = getOutputDirectory(context)
   val cameraExecutor = Executors.newSingleThreadExecutor()
   NavHost(navController, startDestination = AppConstants.NavItemRoutes.GALLERY) {
     composable(AppConstants.NavItemRoutes.GALLERY) {
-      HandleDbState(dbState, showProgress, paddingValues)
+      PhotosList(dbState, showProgress, paddingValues)
     }
     composable(AppConstants.NavItemRoutes.CAPTURE_PHOTO) {
       CameraXView(
@@ -93,10 +96,20 @@ fun NavHostGraph(
         executor = cameraExecutor,
         captureState = captureState,
         onCaptureStateChanged = onImageCaptureStateChanged, paddingValues = paddingValues,
-        showProgress = showProgress
+        showProgress = showProgress,
+        onSessionStart = onSessionStart
       )
     }
   }
+}
+
+@Composable
+fun PhotosList(
+  dbState: DbState,
+  showProgress: Boolean,
+  paddingValues: PaddingValues
+) {
+  HandleDbState(dbState, showProgress, paddingValues)
 }
 
 @Composable
@@ -138,7 +151,7 @@ fun PhotosGrid(
         val formattedDate = formatDate(photo.timeStamp ?: System.currentTimeMillis())
         item(span = {
           GridItemSpan(2)
-        }, key = photo.timeStamp) {
+        }, key = photo.uid) {
           Row(
             modifier = Modifier
               .padding(vertical = 8.dp)
@@ -158,9 +171,7 @@ fun PhotosGrid(
         }
       }
 
-      item(key = {
-        photo.uid
-      }) {
+      item {
         Card(
           modifier = Modifier.fillMaxSize(),
           shape = RoundedCornerShape(8.dp),

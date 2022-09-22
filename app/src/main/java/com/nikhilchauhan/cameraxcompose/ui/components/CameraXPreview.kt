@@ -20,7 +20,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
@@ -48,8 +50,15 @@ fun CameraXView(
   paddingValues: PaddingValues,
   captureState: CaptureState,
   onCaptureStateChanged: (CaptureState) -> Unit,
-  showProgress: Boolean
+  showProgress: Boolean,
+  onSessionStart: () -> Unit
 ) {
+  val currentSessionStart by rememberUpdatedState(onSessionStart)
+
+  LaunchedEffect(key1 = Unit) {
+    currentSessionStart()
+  }
+
   val lensFacing = CameraSelector.LENS_FACING_BACK
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
