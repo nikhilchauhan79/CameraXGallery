@@ -2,19 +2,20 @@ package com.nikhilchauhan.cameraxcompose.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -77,7 +78,7 @@ fun NavHostGraph(
   val cameraExecutor = Executors.newSingleThreadExecutor()
   NavHost(navController, startDestination = AppConstants.NavItemRoutes.GALLERY) {
     composable(AppConstants.NavItemRoutes.GALLERY) {
-      HandleDbState(dbState, showProgress)
+      HandleDbState(dbState, showProgress, paddingValues)
     }
     composable(AppConstants.NavItemRoutes.CAPTURE_PHOTO) {
       CameraXView(
@@ -94,7 +95,8 @@ fun NavHostGraph(
 @Composable
 private fun HandleDbState(
   dbState: DbState,
-  showProgress: Boolean
+  showProgress: Boolean,
+  paddingValues: PaddingValues
 ) {
   when (dbState) {
     is Error -> {
@@ -105,16 +107,21 @@ private fun HandleDbState(
     Init -> {
     }
     is Success -> {
-      PhotosGrid(photos = dbState.list)
+      PhotosGrid(photos = dbState.list, paddingValues)
     }
   }
 }
 
 @Composable
-fun PhotosGrid(photos: List<Photo>) {
+fun PhotosGrid(
+  photos: List<Photo>,
+  paddingValues: PaddingValues
+) {
   LazyVerticalGrid(
-    columns = GridCells.Fixed(count = 3),
-    modifier = Modifier.fillMaxSize(),
+    columns = GridCells.Fixed(count = 2),
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(paddingValues),
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     verticalArrangement = Arrangement.spacedBy(4.dp),
     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -122,7 +129,13 @@ fun PhotosGrid(photos: List<Photo>) {
     items(photos, key = { photo ->
       photo.uid
     }) { photo ->
-      PhotoItem(photo)
+      Card(
+        modifier = Modifier.fillMaxSize(),
+        shape = RoundedCornerShape(8.dp),
+        elevation = 8.dp
+      ) {
+        PhotoItem(photo)
+      }
     }
   }
 }
@@ -130,12 +143,10 @@ fun PhotosGrid(photos: List<Photo>) {
 @Composable
 fun PhotoItem(photo: Photo) {
   val painter = rememberAsyncImagePainter(model = photo.path?.let { File(it) })
-  Column(modifier = Modifier.fillMaxSize()) {
-    Image(
-      painter = painter,
-      contentDescription = null,
-      contentScale = ContentScale.Fit,
-      modifier = Modifier.clip(CircleShape)
-    )
-  }
+  Image(
+    painter = painter,
+    contentDescription = null,
+    contentScale = ContentScale.FillBounds,
+    modifier = Modifier.height(250.dp)
+  )
 }

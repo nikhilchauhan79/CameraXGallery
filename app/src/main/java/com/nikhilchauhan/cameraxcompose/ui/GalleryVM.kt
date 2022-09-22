@@ -48,6 +48,7 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
       onSessionStart()
     }
     capturePhoto(uri)
+    getPhotosFromDB()
   }
 
   private fun capturePhoto(uri: Uri) {
