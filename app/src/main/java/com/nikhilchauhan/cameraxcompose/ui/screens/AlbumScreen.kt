@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -43,6 +45,9 @@ fun AlbumScreen(
           modifier = Modifier
             .fillMaxSize()
             .padding(all = 8.dp)
+            .semantics {
+              contentDescription = "Album Image_" + photosList[page].uid
+            }
         )
       }
     }
