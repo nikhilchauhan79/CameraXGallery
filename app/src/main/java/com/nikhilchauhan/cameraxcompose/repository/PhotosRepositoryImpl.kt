@@ -9,4 +9,6 @@ class PhotosRepositoryImpl @Inject constructor(private val photosDao: PhotosDao)
     photosDao.getPhotos()
 
   override suspend fun savePhoto(photo: Photo) = photosDao.insert(photo)
+  override suspend fun getPhotosByAlbumId(albumId: Long): List<Photo> =
+    photosDao.getPhotosInAlbum(albumId)
 }

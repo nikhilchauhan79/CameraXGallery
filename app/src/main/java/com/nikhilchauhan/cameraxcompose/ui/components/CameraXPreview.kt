@@ -12,7 +12,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,7 +47,6 @@ import kotlin.coroutines.suspendCoroutine
 fun CameraXView(
   outputDirectory: File,
   executor: Executor,
-  paddingValues: PaddingValues,
   captureState: CaptureState,
   onCaptureStateChanged: (CaptureState) -> Unit,
   showProgress: Boolean,
@@ -91,7 +89,7 @@ fun CameraXView(
     contentAlignment = Alignment.BottomCenter,
     modifier = Modifier
       .fillMaxSize()
-      .padding(paddingValues)
+      .padding(vertical = 8.dp, horizontal = 4.dp)
   ) {
     AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
 

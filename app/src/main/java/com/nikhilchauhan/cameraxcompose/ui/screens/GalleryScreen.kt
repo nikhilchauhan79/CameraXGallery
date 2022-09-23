@@ -21,27 +21,18 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 import com.nikhilchauhan.cameraxcompose.localdatasource.entities.Photo
 import com.nikhilchauhan.cameraxcompose.ui.components.BottomNavBar
 import com.nikhilchauhan.cameraxcompose.ui.components.CameraXAppBar
 import com.nikhilchauhan.cameraxcompose.ui.components.CameraXProgressBar
-import com.nikhilchauhan.cameraxcompose.ui.components.CameraXView
 import com.nikhilchauhan.cameraxcompose.ui.navigation.NavHostGraph
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState
@@ -51,9 +42,7 @@ import com.nikhilchauhan.cameraxcompose.ui.states.DbState.Init
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState.Success
 import com.nikhilchauhan.cameraxcompose.ui.states.NavigationItem
 import com.nikhilchauhan.cameraxcompose.utils.AppUtils.formatDate
-import com.nikhilchauhan.cameraxcompose.utils.AppUtils.getOutputDirectory
 import java.io.File
-import java.util.concurrent.Executors
 
 @Composable
 fun GalleryScreen(
@@ -63,7 +52,6 @@ fun GalleryScreen(
   onSessionStart: () -> Unit,
   photosList: List<Photo>,
   onPhotoClick: (Photo) -> Unit,
-  createMap: (Boolean) -> Unit,
   toolbarTitle: String,
   onToolbarTextChanged: (String) -> Unit,
   onImageCaptureStateChanged: (CaptureState) -> Unit,
@@ -71,11 +59,6 @@ fun GalleryScreen(
   val scaffoldState: ScaffoldState = rememberScaffoldState()
   val navController = rememberNavController()
 
-  val createAlbumsMap by rememberUpdatedState(createMap)
-
-  LaunchedEffect(key1 = Unit) {
-    createAlbumsMap(true)
-  }
   Scaffold(
     scaffoldState = scaffoldState,
     bottomBar = {
@@ -91,23 +74,20 @@ fun GalleryScreen(
   }
 }
 
-
 @Composable
 fun PhotosList(
   dbState: DbState,
   showProgress: Boolean,
-  paddingValues: PaddingValues,
   onPhotoClick: (Photo) -> Unit,
   navController: NavHostController
 ) {
-  HandleDbState(dbState, showProgress, paddingValues, onPhotoClick, navController)
+  HandleDbState(dbState, showProgress, onPhotoClick, navController)
 }
 
 @Composable
 private fun HandleDbState(
   dbState: DbState,
   showProgress: Boolean,
-  paddingValues: PaddingValues,
   onPhotoClick: (Photo) -> Unit,
   navController: NavHostController
 ) {
@@ -120,7 +100,7 @@ private fun HandleDbState(
     Init -> {
     }
     is Success -> {
-      PhotosGrid(photos = dbState.list, paddingValues, navController, onPhotoClick)
+      PhotosGrid(photos = dbState.list, navController, onPhotoClick)
     }
   }
 }
@@ -129,41 +109,48 @@ private fun HandleDbState(
 @Composable
 fun PhotosGrid(
   photos: List<Photo>,
-  paddingValues: PaddingValues,
   navController: NavController,
   onPhotoClick: (Photo) -> Unit
 ) {
   LazyVerticalGrid(
     columns = GridCells.Fixed(count = 2),
     modifier = Modifier
-      .fillMaxSize()
-      .padding(paddingValues),
+      .fillMaxSize(),
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     verticalArrangement = Arrangement.spacedBy(4.dp),
     horizontalArrangement = Arrangement.spacedBy(4.dp)
   ) {
-    photos.forEach { photo ->
+    photos.forEachIndexed { index, photo ->
       if (photo.isSessionFirst) {
         val formattedDate = formatDate(photo.timeStamp ?: System.currentTimeMillis())
         item(span = {
           GridItemSpan(2)
         }, key = photo.albumId) {
-          Row(
-            modifier = Modifier
-              .padding(vertical = 8.dp)
-              .height(40.dp)
-              .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+          val padding = if (index != 0) {
+            12.dp
+          } else 8.dp
+          Card(
+            shape = RoundedCornerShape(size = 8.dp), modifier = Modifier
+            .padding(top = padding, bottom = 4.dp)
+            .height(40.dp)
+            .fillMaxWidth(),
+            elevation = 4.dp, backgroundColor = MaterialTheme.colors.secondary
           ) {
-            Text(
-              text = "Album " + photo.uid, style = MaterialTheme.typography.h6,
-              modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            Row(
+              modifier = Modifier
+                .fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(
+                text = "Album " + photo.uid, style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(horizontal = 16.dp)
+              )
 
-            Text(
-              text = formattedDate, style = MaterialTheme.typography.body1,
-              modifier = Modifier.padding(horizontal = 16.dp)
-            )
+              Text(
+                text = formattedDate, style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(horizontal = 16.dp)
+              )
+            }
           }
         }
       }

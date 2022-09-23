@@ -1,7 +1,9 @@
 package com.nikhilchauhan.cameraxcompose.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
@@ -36,9 +38,12 @@ fun NavHostGraph(
   val context = LocalContext.current
   val outputDirectory = AppUtils.getOutputDirectory(context)
   val cameraExecutor = Executors.newSingleThreadExecutor()
-  NavHost(navController, startDestination = NavItemRoutes.GALLERY) {
+  NavHost(
+    navController, startDestination = NavItemRoutes.GALLERY,
+    modifier = Modifier.padding(paddingValues)
+  ) {
     composable(NavItemRoutes.GALLERY) {
-      PhotosList(dbState, showProgress, paddingValues, onPhotoClick, navController)
+      PhotosList(dbState, showProgress, onPhotoClick, navController)
       onToolbarTextChanged(stringResource(id = Gallery.title))
     }
     composable(NavItemRoutes.CAPTURE_PHOTO) {
@@ -46,14 +51,14 @@ fun NavHostGraph(
         outputDirectory = outputDirectory,
         executor = cameraExecutor,
         captureState = captureState,
-        onCaptureStateChanged = onImageCaptureStateChanged, paddingValues = paddingValues,
+        onCaptureStateChanged = onImageCaptureStateChanged,
         showProgress = showProgress,
         onSessionStart = onSessionStart
       )
       onToolbarTextChanged(stringResource(id = CapturePhoto.title))
     }
     composable(NavItemRoutes.ALBUM) {
-      AlbumScreen(photosList, paddingValues)
+      AlbumScreen(photosList)
       onToolbarTextChanged(stringResource(id = NavigationItem.Album.title))
     }
   }

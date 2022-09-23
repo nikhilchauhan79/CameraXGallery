@@ -58,10 +58,8 @@ class MainActivity : ComponentActivity() {
               showProgress.value, {
               endSession()
             }, currentAlbum.collectAsState().value, { photo ->
-              getCurrentAlbum(photo)
-            }, { createMap ->
-              if (createMap) {
-                createPhotosMap()
+              photo.albumId?.let { nnAlbumId ->
+                getPhotosByAlbumId(nnAlbumId)
               }
             }, toolbarText.collectAsState().value, { newTitle ->
               toolbarText.value = newTitle
