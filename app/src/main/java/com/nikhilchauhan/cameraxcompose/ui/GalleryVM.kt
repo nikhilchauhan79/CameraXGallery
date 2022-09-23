@@ -6,6 +6,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nikhilchauhan.cameraxcompose.R
+import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 import com.nikhilchauhan.cameraxcompose.localdatasource.entities.Photo
 import com.nikhilchauhan.cameraxcompose.repository.PhotosRepository
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
@@ -22,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GalleryVM @Inject constructor(private val repository: PhotosRepository) : ViewModel() {
   private val _photosDbState = MutableStateFlow<DbState>(DbState.Init)
-
+  val toolbarText = MutableStateFlow(AppConstants.APP_NAME)
   val photoDbState: StateFlow<DbState> = _photosDbState
   private val _isSessionFirstPhoto = mutableStateOf(false)
   private val isSessionFirstPhoto: State<Boolean> = _isSessionFirstPhoto

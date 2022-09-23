@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +47,7 @@ fun DotsIndicator(
           modifier = Modifier
             .size(16.dp)
             .clip(CircleShape)
-            .background(androidx.compose.ui.graphics.Color.Black)
+            .background(MaterialTheme.colors.secondary)
             .clickable {
               scope.launch {
                 pagerState.animateScrollToPage(page = index)
@@ -58,7 +59,7 @@ fun DotsIndicator(
           modifier = Modifier
             .size(16.dp)
             .clip(CircleShape)
-            .background(androidx.compose.ui.graphics.Color.Gray)
+            .background(MaterialTheme.colors.onBackground.copy(alpha = 0.5f))
             .clickable {
               scope.launch {
                 pagerState.animateScrollToPage(page = index)
@@ -68,7 +69,7 @@ fun DotsIndicator(
       }
 
       if (index != album.size - 1) {
-        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+        Spacer(modifier = Modifier.padding(horizontal = 6.dp))
       }
     }
   }

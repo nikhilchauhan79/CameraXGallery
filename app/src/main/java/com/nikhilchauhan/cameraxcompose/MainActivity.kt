@@ -14,15 +14,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
+import com.nikhilchauhan.cameraxcompose.R.string
 import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 import com.nikhilchauhan.cameraxcompose.ui.GalleryVM
+import com.nikhilchauhan.cameraxcompose.ui.components.AppProgressBar
 import com.nikhilchauhan.cameraxcompose.ui.screens.GalleryScreen
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.Error
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.InProgress
 import com.nikhilchauhan.cameraxcompose.ui.theme.CameraXComposeTheme
+import com.nikhilchauhan.cameraxcompose.utils.AlertUtils
 import com.nikhilchauhan.cameraxcompose.utils.PermissionsUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,6 +43,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
 
     if (!PermissionsUtils.checkPermissions(this)) {
       PermissionsUtils.PERMISSIONS.onEach { permission ->
@@ -60,6 +66,8 @@ class MainActivity : ComponentActivity() {
             if (createMap) {
               galleryVM.createPhotosMap()
             }
+          }, galleryVM.toolbarText.collectAsState().value, { newTitle ->
+            galleryVM.toolbarText.value = newTitle
           }
           ) { captureState ->
             handleCaptureState(captureState, galleryVM) {
@@ -78,6 +86,12 @@ class MainActivity : ComponentActivity() {
   ) {
     when (captureState) {
       is Error -> {
+        lifecycleScope.launch {
+          AlertUtils.showToast(
+            this@MainActivity,
+            "Error Capturing Photo: ${captureState.message} ${captureState.error}"
+          )
+        }
         showProgress(false)
         Log.d(
           AppConstants.MAIN_ACTIVITY,
@@ -85,6 +99,9 @@ class MainActivity : ComponentActivity() {
         )
       }
       InProgress -> {
+        lifecycleScope.launch {
+          AlertUtils.showToast(this@MainActivity, getString(string.photo_capture_in_progress))
+        }
         showProgress(true)
         Log.d(AppConstants.MAIN_ACTIVITY, "handleCaptureState: " + "photo capture in progress")
       }
@@ -92,22 +109,14 @@ class MainActivity : ComponentActivity() {
         showProgress(false)
       }
       is CaptureState.Success -> {
+        lifecycleScope.launch {
+          AlertUtils.showToast(
+            this@MainActivity, getString(string.photo_capture_success) + " ${captureState.uri}"
+          )
+        }
         showProgress(false)
         galleryVM.savePhotoToDb(captureState.uri)
       }
     }
-  }
-}
-
-@Composable
-fun Greeting(name: String) {
-  Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-  CameraXComposeTheme {
-    Greeting("Android")
   }
 }

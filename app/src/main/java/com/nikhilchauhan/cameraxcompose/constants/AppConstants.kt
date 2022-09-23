@@ -1,6 +1,8 @@
 package com.nikhilchauhan.cameraxcompose.constants
 
 object AppConstants {
+  const val ALBUM: String = "Album"
+  const val APP_NAME: String = "CameraXCompose"
   const val DATE_FORMAT: String = "dd/MM/yyyy H:mm"
   const val TIME_FORMAT: String = "H:mm"
   const val IMAGE_CAPTURE_IN_PROGRESS: String = "Image capture already in progress"

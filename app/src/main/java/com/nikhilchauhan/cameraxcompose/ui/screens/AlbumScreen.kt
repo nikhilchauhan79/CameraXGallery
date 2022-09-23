@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -15,6 +16,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 import com.nikhilchauhan.cameraxcompose.localdatasource.entities.Photo
 import com.nikhilchauhan.cameraxcompose.ui.components.DotsIndicator
 import java.io.File
@@ -23,11 +25,12 @@ import java.io.File
 @Composable
 fun AlbumScreen(
   photosList: List<Photo>,
-  paddingValues: PaddingValues
+  paddingValues: PaddingValues,
 ) {
   Log.d("TAG", "AlbumScreen: " + photosList.size)
   val pagerState = rememberPagerState()
   val coroutineScope = rememberCoroutineScope()
+
   Column(modifier = Modifier.fillMaxSize()) {
     HorizontalPager(
       count = photosList.size, state = pagerState, modifier = Modifier.weight(1f)

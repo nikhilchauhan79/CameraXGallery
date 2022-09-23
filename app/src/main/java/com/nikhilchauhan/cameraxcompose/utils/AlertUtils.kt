@@ -1,6 +1,7 @@
 package com.nikhilchauhan.cameraxcompose.utils
 
 import android.content.Context
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.StringRes
 
@@ -18,5 +19,4 @@ object AlertUtils {
   ) {
     Toast.makeText(context, textRes, Toast.LENGTH_LONG).show()
   }
-
 }

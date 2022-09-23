@@ -11,9 +11,11 @@ import androidx.compose.ui.res.stringResource
 import com.nikhilchauhan.cameraxcompose.R
 
 @Composable
-fun CameraXAppBar() {
+fun CameraXAppBar(
+  title: String
+) {
   TopAppBar(title = {
-    Text(text = stringResource(id = R.string.app_name))
+    Text(text = title)
   }, navigationIcon = {
     IconButton(onClick = {
 

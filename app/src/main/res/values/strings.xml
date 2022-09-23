@@ -7,4 +7,6 @@
   <string name="title_capture_photo">Capture</string>
   <string name="title_activity_photo_capture">PhotoCaptureActivity</string>
   <string name="albums">Albums</string>
+  <string name="photo_capture_success">Successfully Captured Photo</string>
+  <string name="photo_capture_in_progress">Capturing Photo In Progress</string>
 </resources>

@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -41,6 +42,7 @@ import com.nikhilchauhan.cameraxcompose.ui.components.BottomNavBar
 import com.nikhilchauhan.cameraxcompose.ui.components.CameraXAppBar
 import com.nikhilchauhan.cameraxcompose.ui.components.CameraXProgressBar
 import com.nikhilchauhan.cameraxcompose.ui.components.CameraXView
+import com.nikhilchauhan.cameraxcompose.ui.navigation.NavHostGraph
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState.Error
@@ -62,6 +64,8 @@ fun GalleryScreen(
   photosList: List<Photo>,
   onPhotoClick: (Photo) -> Unit,
   createMap: (Boolean) -> Unit,
+  toolbarTitle: String,
+  onToolbarTextChanged: (String) -> Unit,
   onImageCaptureStateChanged: (CaptureState) -> Unit,
 ) {
   val scaffoldState: ScaffoldState = rememberScaffoldState()
@@ -77,50 +81,16 @@ fun GalleryScreen(
     bottomBar = {
       BottomNavBar(navController)
     }, topBar = {
-    CameraXAppBar()
+    CameraXAppBar(toolbarTitle)
   }
   ) { paddingValues ->
     NavHostGraph(
       navController, dbState, paddingValues, captureState, onImageCaptureStateChanged, showProgress,
-      onSessionStart, onPhotoClick, photosList
+      onSessionStart, onPhotoClick, photosList, onToolbarTextChanged
     )
   }
 }
 
-@Composable
-fun NavHostGraph(
-  navController: NavHostController,
-  dbState: DbState,
-  paddingValues: PaddingValues,
-  captureState: CaptureState,
-  onImageCaptureStateChanged: (CaptureState) -> Unit,
-  showProgress: Boolean,
-  onSessionStart: () -> Unit,
-  onPhotoClick: (Photo) -> Unit,
-  photosList: List<Photo>
-) {
-  val context = LocalContext.current
-  val outputDirectory = getOutputDirectory(context)
-  val cameraExecutor = Executors.newSingleThreadExecutor()
-  NavHost(navController, startDestination = AppConstants.NavItemRoutes.GALLERY) {
-    composable(AppConstants.NavItemRoutes.GALLERY) {
-      PhotosList(dbState, showProgress, paddingValues, onPhotoClick, navController)
-    }
-    composable(AppConstants.NavItemRoutes.CAPTURE_PHOTO) {
-      CameraXView(
-        outputDirectory = outputDirectory,
-        executor = cameraExecutor,
-        captureState = captureState,
-        onCaptureStateChanged = onImageCaptureStateChanged, paddingValues = paddingValues,
-        showProgress = showProgress,
-        onSessionStart = onSessionStart
-      )
-    }
-    composable(AppConstants.NavItemRoutes.ALBUM) {
-      AlbumScreen(photosList, paddingValues)
-    }
-  }
-}
 
 @Composable
 fun PhotosList(
