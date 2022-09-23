@@ -117,7 +117,7 @@ fun NavHostGraph(
       )
     }
     composable(AppConstants.NavItemRoutes.ALBUM) {
-      AlbumScreen(photosList)
+      AlbumScreen(photosList, paddingValues)
     }
   }
 }
@@ -177,7 +177,7 @@ fun PhotosGrid(
         val formattedDate = formatDate(photo.timeStamp ?: System.currentTimeMillis())
         item(span = {
           GridItemSpan(2)
-        }) {
+        }, key = photo.albumId) {
           Row(
             modifier = Modifier
               .padding(vertical = 8.dp)
@@ -186,18 +186,19 @@ fun PhotosGrid(
             verticalAlignment = Alignment.CenterVertically
           ) {
             Text(
-              text = formattedDate.first, style = MaterialTheme.typography.h6,
+              text = "Album " + photo.uid, style = MaterialTheme.typography.h6,
               modifier = Modifier.padding(horizontal = 16.dp)
             )
+
             Text(
-              text = formattedDate.second, style = MaterialTheme.typography.h6,
-              modifier = Modifier.padding(end = 16.dp)
+              text = formattedDate, style = MaterialTheme.typography.body1,
+              modifier = Modifier.padding(horizontal = 16.dp)
             )
           }
         }
       }
 
-      item {
+      item(key = photo.uid) {
         Card(
           modifier = Modifier.fillMaxSize(),
           shape = RoundedCornerShape(8.dp),
