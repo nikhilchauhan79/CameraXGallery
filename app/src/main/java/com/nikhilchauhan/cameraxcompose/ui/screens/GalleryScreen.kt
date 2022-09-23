@@ -33,7 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -118,6 +120,13 @@ private fun HandleDbState(
     Init -> {
     }
     is Success -> {
+      if (dbState.list.isEmpty()) {
+        Text(
+          text = "No photos found, capture some pics then they will appear here",
+          style = TextStyle(color = MaterialTheme.colors.onBackground, fontSize = 20.sp),
+          modifier = Modifier.padding(all = 8.dp)
+        )
+      }
       PhotosGrid(photos = dbState.list, navController, onPhotoClick)
     }
   }

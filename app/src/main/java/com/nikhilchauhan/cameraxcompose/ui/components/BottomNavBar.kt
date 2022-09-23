@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -52,12 +51,11 @@ fun BottomNavBar(
           )
           Text(
             text = stringResource(id = navItem.title),
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            style = TextStyle(color = MaterialTheme.colors.onPrimary)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
           )
         }
-      }, alwaysShowLabel = true, selectedContentColor = MaterialTheme.colors.onPrimary,
-        unselectedContentColor = MaterialTheme.colors.onPrimary.copy(0.4f)
+      }, alwaysShowLabel = true, selectedContentColor = MaterialTheme.colors.secondary,
+        unselectedContentColor = MaterialTheme.colors.secondary.copy(0.45f)
       )
     }
   }

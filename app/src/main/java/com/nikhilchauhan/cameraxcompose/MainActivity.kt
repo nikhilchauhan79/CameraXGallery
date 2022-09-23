@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
       is CaptureState.Success -> {
         lifecycleScope.launch {
           AlertUtils.showToast(
-            this@MainActivity, getString(string.photo_capture_success) + " ${captureState.uri}"
+            this@MainActivity, getString(string.photo_capture_success)
           )
         }
         showProgress(false)
