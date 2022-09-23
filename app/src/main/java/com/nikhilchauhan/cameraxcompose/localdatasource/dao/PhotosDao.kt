@@ -11,6 +11,9 @@ interface PhotosDao {
   @Query("SELECT * FROM photo")
   fun getPhotos(): List<Photo>
 
+  @Query("SELECT * FROM photo WHERE album_id = :albumId")
+  fun getPhotosInAlbum(albumId: Long): List<Photo>
+
   @Insert
   fun insertAll(list: List<Photo>)
 
@@ -19,4 +22,7 @@ interface PhotosDao {
 
   @Delete
   fun delete(photo: Photo)
+
+  @Query("DELETE FROM photo WHERE uid = :id")
+  fun deletePhotoById(id: Int)
 }

@@ -8,17 +8,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import com.nikhilchauhan.cameraxcompose.R.string
 import com.nikhilchauhan.cameraxcompose.constants.AppConstants
 import com.nikhilchauhan.cameraxcompose.ui.GalleryVM
-import com.nikhilchauhan.cameraxcompose.ui.components.AppProgressBar
 import com.nikhilchauhan.cameraxcompose.ui.screens.GalleryScreen
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState
 import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.Error
@@ -56,22 +52,24 @@ class MainActivity : ComponentActivity() {
       CameraXComposeTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-          GalleryScreen(
-            galleryVM.photoDbState.collectAsState().value, galleryVM.photoCaptureState.value,
-            galleryVM.showProgress.value, {
-            galleryVM.endSession()
-          }, galleryVM.currentAlbum.collectAsState().value, { photo ->
-            galleryVM.getCurrentAlbum(photo)
-          }, { createMap ->
-            if (createMap) {
-              galleryVM.createPhotosMap()
+          galleryVM.apply {
+            GalleryScreen(
+              photoDbState.collectAsState().value, photoCaptureState.value,
+              showProgress.value, {
+              endSession()
+            }, currentAlbum.collectAsState().value, { photo ->
+              getCurrentAlbum(photo)
+            }, { createMap ->
+              if (createMap) {
+                createPhotosMap()
+              }
+            }, toolbarText.collectAsState().value, { newTitle ->
+              toolbarText.value = newTitle
             }
-          }, galleryVM.toolbarText.collectAsState().value, { newTitle ->
-            galleryVM.toolbarText.value = newTitle
-          }
-          ) { captureState ->
-            handleCaptureState(captureState, galleryVM) {
-              galleryVM.showProgress.value = it
+            ) { captureState ->
+              handleCaptureState(captureState, galleryVM) {
+                showProgress.value = it
+              }
             }
           }
         }
