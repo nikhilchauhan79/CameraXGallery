@@ -59,6 +59,20 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-184365989">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="adb-3080835525000FA-OWLnrx._adb-tls-connect._tcp" value="120" />
+                  <entry key="vivo&#10; I2011" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="256971829">
           <value>
             <AndroidTestResultsTableState>
@@ -130,6 +144,20 @@
           </value>
         </entry>
         <entry key="1912686243">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="adb-3080835525000FA-OWLnrx._adb-tls-connect._tcp" value="120" />
+                  <entry key="vivo&#10; I2011" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1977379277">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
