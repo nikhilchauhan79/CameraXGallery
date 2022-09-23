@@ -22,10 +22,10 @@ class PhotosDatabaseTest {
 
   companion object {
     val samplePhotos = listOf<Photo>(
-      Photo(1, "Test Photo", System.currentTimeMillis(), "Test Album", 10L, "/fake/path", 5, true),
-      Photo(2, "Test Photo", System.currentTimeMillis(), "Test Album", 10L, "/fake/path", 2, false),
-      Photo(3, "Test Photo", System.currentTimeMillis(), "Test Album", 20L, "/fake/path", 3, true),
-      Photo(4, "Test Photo", System.currentTimeMillis(), "Test Album", 20L, "/fake/path", 4, false)
+      Photo(1, "Test Photo", System.currentTimeMillis(), "Test Album 1", 10L, "/fake/path", 5, true),
+      Photo(2, "Test Photo", System.currentTimeMillis(), "Test Album 2", 10L, "/fake/path", 2, false),
+      Photo(3, "Test Photo", System.currentTimeMillis(), "Test Album 3", 20L, "/fake/path", 3, true),
+      Photo(4, "Test Photo", System.currentTimeMillis(), "Test Album 4", 20L, "/fake/path", 4, false)
     )
   }
 

@@ -24,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -143,7 +145,9 @@ fun PhotosGrid(
             ) {
               Text(
                 text = "Album " + photo.uid, style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp).semantics {
+                  contentDescription = "Album Name"
+                }
               )
 
               Text(
@@ -181,7 +185,9 @@ fun PhotoItem(
       painter = painter,
       contentDescription = null,
       contentScale = ContentScale.FillBounds,
-      modifier = Modifier.fillMaxSize(1f)
+      modifier = Modifier.fillMaxSize(1f).semantics {
+        contentDescription = "Image"
+      }
     )
   }
 }

@@ -125,4 +125,7 @@ dependencies {
 
   androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_ui_version")
   debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_ui_version")
+
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+
 }
