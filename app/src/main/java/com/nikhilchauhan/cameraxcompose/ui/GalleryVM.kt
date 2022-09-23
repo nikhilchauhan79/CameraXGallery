@@ -14,9 +14,11 @@ import com.nikhilchauhan.cameraxcompose.ui.states.CaptureState.Success
 import com.nikhilchauhan.cameraxcompose.ui.states.DbState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,6 +34,7 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
   val currentAlbum = MutableStateFlow<MutableList<Photo>>(mutableListOf())
   val photoCaptureState: MutableState<CaptureState> = mutableStateOf(CaptureState.Init)
   private val totalCurrentSession = mutableStateOf(0)
+  private val totalAlbums = mutableStateOf(0)
   private val albumCurrentSession = mutableStateOf("")
   private val albumId = mutableStateOf(0L)
   private val sessionEnd = mutableStateOf(false)
@@ -39,6 +42,7 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
   private val currentPhoto = mutableStateOf("")
 
   init {
+    setTotalAlbums()
     onSessionStart()
     getPhotosFromDB()
   }
@@ -50,6 +54,18 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
     sessionEnd.value = false
     albumCurrentSession.value = "Album_$time"
     albumId.value = time
+    totalAlbums.value++
+  }
+
+  private fun setTotalAlbums() {
+    viewModelScope.launch(Dispatchers.IO) {
+      val total = async {
+        repository.getTotalAlbums()
+      }
+      withContext(Dispatchers.Main) {
+        totalAlbums.value = total.await()
+      }
+    }
   }
 
   fun getPhotosByAlbumId(albumId: Long) {
@@ -74,7 +90,8 @@ class GalleryVM @Inject constructor(private val repository: PhotosRepository) : 
       photoCaptureState.value = Success(uri)
       currentPhoto.value = "Photo_$time"
       val photo = Photo(
-        0, currentPhoto.value, time, albumCurrentSession.value, albumId.value, uri.path,
+        0, totalAlbums.value, currentPhoto.value, time, albumCurrentSession.value, albumId.value,
+        uri.path,
         totalCurrentSession.value, isSessionFirstPhoto.value
       )
       repository.savePhoto(

@@ -144,10 +144,12 @@ fun PhotosGrid(
               verticalAlignment = Alignment.CenterVertically
             ) {
               Text(
-                text = "Album " + photo.uid, style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(horizontal = 16.dp).semantics {
-                  contentDescription = "Album Name"
-                }
+                text = "Album " + photo.totalAlbums, style = MaterialTheme.typography.h6,
+                modifier = Modifier
+                  .padding(horizontal = 16.dp)
+                  .semantics {
+                    contentDescription = "Album Name"
+                  }
               )
 
               Text(
@@ -185,9 +187,11 @@ fun PhotoItem(
       painter = painter,
       contentDescription = null,
       contentScale = ContentScale.FillBounds,
-      modifier = Modifier.fillMaxSize(1f).semantics {
-        contentDescription = "Image"
-      }
+      modifier = Modifier
+        .fillMaxSize(1f)
+        .semantics {
+          contentDescription = "Image"
+        }
     )
   }
 }

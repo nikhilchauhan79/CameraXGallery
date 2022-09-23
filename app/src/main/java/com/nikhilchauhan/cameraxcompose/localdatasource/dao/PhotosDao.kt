@@ -14,6 +14,9 @@ interface PhotosDao {
   @Query("SELECT * FROM photo WHERE album_id = :albumId")
   fun getPhotosInAlbum(albumId: Long): List<Photo>
 
+  @Query("SELECT MAX(total_albums) FROM photo")
+  fun getTotalAlbums(): Int
+
   @Insert
   fun insertAll(list: List<Photo>)
 

@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class Photo(
   @PrimaryKey(autoGenerate = true)
   val uid: Int,
+  @ColumnInfo(name = "total_albums") val totalAlbums: Int,
   @ColumnInfo(name = "name") val name: String?,
   @ColumnInfo(name = "time_stamp") val timeStamp: Long?,
   @ColumnInfo(name = "album_name") val albumName: String?,
