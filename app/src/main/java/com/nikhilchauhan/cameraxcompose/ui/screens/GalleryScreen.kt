@@ -19,8 +19,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -60,13 +67,22 @@ fun GalleryScreen(
 ) {
   val scaffoldState: ScaffoldState = rememberScaffoldState()
   val navController = rememberNavController()
-
+  var appBarIcon by remember {
+    mutableStateOf(Icons.Filled.Menu)
+  }
+  appBarIcon = if (navController.previousBackStackEntry != null) {
+    Icons.Filled.ArrowBack
+  } else {
+    Icons.Filled.Menu
+  }
   Scaffold(
     scaffoldState = scaffoldState,
     bottomBar = {
       BottomNavBar(navController)
     }, topBar = {
-    CameraXAppBar(toolbarTitle)
+    CameraXAppBar(toolbarTitle, appBarIcon) {
+      navController.navigateUp()
+    }
   }
   ) { paddingValues ->
     NavHostGraph(
@@ -118,9 +134,9 @@ fun PhotosGrid(
     columns = GridCells.Fixed(count = 2),
     modifier = Modifier
       .fillMaxSize(),
-    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
     verticalArrangement = Arrangement.spacedBy(4.dp),
-    horizontalArrangement = Arrangement.spacedBy(4.dp)
+    horizontalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     photos.forEachIndexed { index, photo ->
       if (photo.isSessionFirst) {
